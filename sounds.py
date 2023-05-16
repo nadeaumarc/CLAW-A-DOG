@@ -11,7 +11,8 @@ class Sounds:
         self.BEEP_2 = pygame.mixer.Sound(os.path.join('audio', 'beep2.mp3'))
         self.BEEP_2.set_volume(0.25)
         self.ANGRY_CAT_SOUND = pygame.mixer.Sound(os.path.join('audio', 'cat_angry.mp3'))
-        self.WHINING_DOG_SOUND = pygame.mixer.Sound(os.path.join('audio', 'dog_whining.mp3'))        
+        self.WHINING_DOG_SOUND = pygame.mixer.Sound(os.path.join('audio', 'dog_whining.mp3'))
+        self.FASTER_SOUND = pygame.mixer.Sound(os.path.join('audio', 'faster.mp3'))        
         self.GAME_OVER_SOUND = pygame.mixer.Sound(os.path.join('audio', 'game_over.mp3'))
         self.GAME_OVER_SOUND.set_volume(0.25)
         self.WELL_DONE_SOUND = pygame.mixer.Sound(os.path.join('audio', 'well_done.mp3'))
@@ -29,7 +30,7 @@ class Sounds:
         self.BACKGROUND_MUSIC.play()
         
     def stop_game(self):
-        self.background_music.stop()
+        self.BACKGROUND_MUSIC.stop()
         
     def beep1(self):
         self.BEEP_1.play()
@@ -42,6 +43,9 @@ class Sounds:
         
     def whining_dog(self):
         self.WHINING_DOG_SOUND.play()
+        
+    def faster(self):
+        self.FASTER_SOUND.play()
         
     def game_over(self):
         self.GAME_OVER_SOUND.play()

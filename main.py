@@ -1,10 +1,7 @@
 import pygame, sys, random, os
 from button import Button
 from sounds import Sounds
-
-pygame.mixer.init()
 pygame.init()
-
 
 class GameStart:
     def __init__(self):
@@ -16,8 +13,9 @@ class GameStart:
         #INITIALIZE SOUND EFFECTS
         self.sound_effect = Sounds() 
         
-        clock = pygame.time.Clock() #**********GARDE???????????***********
-        #clock.tick(60)
+        #ASSIGN CLOCK AND FPS
+        clock = pygame.time.Clock()
+        FPS = 60
         
         #CURSOR
         CURSOR_IMAGE = pygame.image.load(os.path.join('images', 'cursor.cur'))
@@ -35,14 +33,15 @@ class GameStart:
         YELLOW = (255, 255, 0)
         GREEN = (76, 187, 23)
 
+
         #RETURNS FONT AND SIZE
         def get_font(font, size):
             if font == 1:
                 return pygame.font.Font(os.path.join('fonts', 'font1.ttf'), size)
             else:
                 return pygame.font.Font(os.path.join('fonts', 'font2.ttf'), size)
-            
-            
+             
+              
         #MAIN MENU
         def main_menu():
             self.sound_effect.start_menu()          
@@ -54,7 +53,8 @@ class GameStart:
             DOG_IMAGE = pygame.image.load(os.path.join('images', 'aussie1.png'))  
             EXIT_BUTTON = Button(image=pygame.image.load(os.path.join('images', 'exit.png')), pos=(500, 700))
             
-            while True:             
+            while True:
+                clock.tick(FPS)              
                 menu_mouse_pos = pygame.mouse.get_pos()  
                 
                 SCREEN.blit(MENU_BG, (0, 0))
@@ -77,7 +77,6 @@ class GameStart:
                             sys.exit()
 
                 pygame.display.update()
-                clock.tick(60)
                 
                               
         #MULTI-LINE TEXT FORMATTING
@@ -98,116 +97,96 @@ class GameStart:
                     beginning_x += split_word.get_width() * 1.2
 
 
-        #START GAME
-        def play():    #AJOUTER TIMER AFFICHÉ À L'ÉCRAN, UN FPS ET CHIEN QUI APPARAIT CHAQUE SECONDES
+        #GAME SCREEN
+        def play():
             ready_set_claw()
             self.sound_effect.start_game()   
-            
+        
             clawed = 0
             lives = 9
+            dont_claw_me = False
             spray = False
-            claw_dog = False
-            counter = 96 
-
-                
-            TITLE_TEXT = get_font(1, 100).render("CLAW-A-DOG", True, GREEN)
-            TITLE_RECT = TITLE_TEXT.get_rect(center=(500, 95))
-            clawed_text = "CLAWED:" + str(clawed)
-            lives_text = "LIVES:      " + str(lives)      
-            SPRAY_IMAGE = pygame.image.load(os.path.join('images', 'spray.png'))
+            can_claw_dog = False
+            timer = 5760
+            spawn_time = 50
             
-            
-            
-#******************************************************************************************************************************
             while True:
-                clock.tick(1)           
-                play_mouse_pos = pygame.mouse.get_pos()             #clock.tick(60)
-                click = False
+                clock.tick(FPS)           
+                play_mouse_pos = pygame.mouse.get_pos()
                 
-                #METTRE BG ET TEXTES À JOUR
-                SCREEN.blit(BG, (0, 0))
-                SCREEN.blit(TITLE_TEXT, TITLE_RECT)
-                SCREEN.blit(get_font(2, 40).render(clawed_text, True, YELLOW), (15, 50))
-                SCREEN.blit(get_font(2, 40).render(lives_text, True, RED), (15, 100))
-                pygame.display.update()
+                if timer == 3840:
+                    self.sound_effect.faster()
+                    spawn_time = 45
+                if timer == 1920:
+                    self.sound_effect.faster()
+                    spawn_time = 40
                 
-                if counter == 0 or lives == 0:
-                    self.sound_effect.stop_game()
-                    pygame.time.delay(1000)
-                    end_game(clawed, lives)
-                
-                if claw_dog:
-                    if spray:
-                        click = True
-                        lives -= 1
-                        lives_text = "LIVES:      " + str(lives)
-                        SCREEN.blit(SPRAY_IMAGE, (750, 150))
-                        self.sound_effect.angry_cat() 
-                    else:
-                        click = True
-                        clawed += 1
-                        clawed_text = "CLAWED:" + str(clawed)
-                        self.sound_effect.whining_dog()
-                    claw_dog = False   
-     
-                
-                
-                #CHOISIR ET COORDONÉES IMAGE DE CHIEN
-                whichDog = random.randint(1, 3)
-                if whichDog == 1:
-                    im = pygame.image.load(os.path.join('images', 'aussie1.png'))
-                    spray = True
-                elif whichDog == 2:
-                    im = pygame.image.load(os.path.join('images', 'aussie2.png'))
+                if  timer % spawn_time == 0: 
+                    whichDog = random.randint(1, 3)
+                    if whichDog == 1:
+                        im = pygame.image.load(os.path.join('images', 'aussie1.png'))
+                        dont_claw_me = True
+                    elif whichDog == 2:
+                        im = pygame.image.load(os.path.join('images', 'aussie2.png'))
+                        dont_claw_me = False
+                    elif whichDog == 3:
+                        im = pygame.image.load(os.path.join('images', 'aussie3.png'))
+                        dont_claw_me = False
+                    coorX = random.randint(50,950)
+                    coorY = random.randint(200,750)
+                    dog_button = Button(image=im, pos=(coorX, coorY))
+                    update_screen(clawed, lives, dog_button, spray)
                     spray = False
-                elif whichDog == 3:
-                    im = pygame.image.load(os.path.join('images', 'aussie3.png'))
-                    spray = False
-                coorX = random.randint(50,950)
-                coorY = random.randint(200,650)
-                #DOG_BUTTON = Button(image=im, pos=(coorX, coorY)) 
-                DOG_BUTTON = Button(image=im, pos=(400, 400))    
-                
-                
-                #AFFICHAGE DU CHIEN
-                SCREEN.blit(DOG_BUTTON.image, DOG_BUTTON.rect)
-                pygame.display.update()
+                    can_claw_dog = True
                   
-                
-                
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()      
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        if click == False:
-                            if DOG_BUTTON.Input(play_mouse_pos):
-                                claw_dog = True
-                                # if spray:
-                                #     click = True
-                                #     lives -= 1
-                                #     #lives_text = "LIVES:      " + str(lives)
-                                #     SCREEN.blit(SPRAY_IMAGE, (750, 150))
-                                #     self.sound_effect.angry_cat() 
-                                # else:
-                                #     click = True
-                                #     clawed += 1
-                                #     #clawed_text = "CLAWED:" + str(clawed)
-                                #     self.sound_effect.whining_dog()  
-                
+                        if can_claw_dog:
+                            can_claw_dog = False
+                            if dog_button.Input(play_mouse_pos):
+                                if dont_claw_me:
+                                    spray = True
+                                    lives -= 1
+                                    self.sound_effect.angry_cat() 
+                                else:
+                                    clawed += 1
+                                    self.sound_effect.whining_dog()  
                                     
-                pygame.time.delay(1000)                    
-                counter -= 1                
-#******************************************************************************************************************************
+                if timer == 0 or lives == 0:
+                    update_screen(clawed, lives, dog_button, spray)
+                    self.sound_effect.stop_game()
+                    pygame.time.delay(1000)
+                    end_game(clawed, lives)
+                                
+                timer -= 1                
 
+
+        #UPDATE GAME SCREEN WITH NEW VALUES
+        def update_screen(clawed, lives, dog_button, spray):
+            TITLE_TEXT = get_font(1, 100).render("CLAW-A-DOG", True, GREEN)
+            TITLE_RECT = TITLE_TEXT.get_rect(center=(500, 95))
+            clawed_text = "CLAWED:" + str(clawed)
+            lives_text = "LIVES:      " + str(lives) 
+            SPRAY_IMAGE = pygame.image.load(os.path.join('images', 'spray.png'))
+            
+            SCREEN.blit(BG, (0, 0))
+            SCREEN.blit(TITLE_TEXT, TITLE_RECT)
+            SCREEN.blit(get_font(2, 40).render(clawed_text, True, YELLOW), (15, 50))
+            SCREEN.blit(get_font(2, 40).render(lives_text, True, RED), (15, 100))
+            if spray:
+                SCREEN.blit(SPRAY_IMAGE, (750, 150))
+            SCREEN.blit(dog_button.image, dog_button.rect)
+            pygame.display.update()
 
         
         #GAME COUNTDOWN
         def ready_set_claw():
             countdown_text = ""
             countdown = 3
-            position = (400, 275)
-            
+            position = (400, 275) 
             TITLE_TEXT = get_font(1, 100).render("CLAW-A-DOG", True, GREEN)
             TITLE_RECT = TITLE_TEXT.get_rect(center=(500, 95))   
             
@@ -240,14 +219,15 @@ class GameStart:
             if lives == 0:
                 self.sound_effect.game_over()
                 SCREEN.blit(GAME_OVER_IMAGE, (375, 200))
-            elif clawed >= 45:
+            elif clawed >= 50:
                 self.sound_effect.well_done()
                 SCREEN.blit(WELL_DONE_IMAGE, (375, 200))
             else:
                 self.sound_effect.try_again()
                 SCREEN.blit(TRY_AGAIN_IMAGE, (375, 275))
   
-            while True:             
+            while True: 
+                clock.tick(FPS)             
                 MENU_MOUSE_POS = pygame.mouse.get_pos()   
                 SCREEN.blit(BACK_MENU_BUTTON.image, BACK_MENU_BUTTON.rect)
                 
@@ -263,7 +243,6 @@ class GameStart:
 
 
         main_menu()
-        #end_game(30, 1)
        
     
 if __name__ == "__main__":
