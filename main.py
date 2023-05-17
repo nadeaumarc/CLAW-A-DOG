@@ -107,17 +107,17 @@ class GameStart:
             dont_claw_me = False
             spray = False
             can_claw_dog = False
-            timer = 5760
+            timer = 5640
             spawn_time = 50
             
             while True:
                 clock.tick(FPS)           
                 play_mouse_pos = pygame.mouse.get_pos()
                 
-                if timer == 3840:
+                if timer == 3760:
                     self.sound_effect.faster()
                     spawn_time = 45
-                if timer == 1920:
+                if timer == 1880:
                     self.sound_effect.faster()
                     spawn_time = 40
                 
